@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conjetura de Goldbach Extendida</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        select, input, button {
+            font-size: 1em;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        #result {
+            margin-top: 20px;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            select, input, button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Conjetura de Goldbach Extendida</h1>
+    <p>Seleccione una de las partes de la conjetura e introduzca un número para ver las posibles combinaciones:</p>
+    
+    <select id="conjectureType">
+        <option value="1">Conjetura de Goldbach para todos los enteros positivos</option>
+        <option value="2">Conjetura fuerte de Golbach</option>
+        <option value="3">Conjetura debil de Goldbach</option>
+    </select>
+    
+    <input type="number" id="number" min="2" placeholder="Ingrese un número">
+    <button onclick="calculateGoldbach()">Calcular</button>
+    <div id="result"></div>
+
+    <script>
+        function isPrime(num) {
+            if (num < 2) return false;
+            for (let i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        }
+
+        function findTwoPrimeSums(number) {
+            let combinations = [];
+            for (let i = 2; i <= number / 2; i++) {
+                if (isPrime(i) && isPrime(number - i)) {
+                    combinations.push(`${i} + ${number - i}`);
+                }
+            }
+            return combinations;
+        }
+
+        function findThreePrimeSums(number) {
+            let combinations = [];
+            for (let i = 2; i < number - 3; i++) {
+                for (let j = i; j < number - i - 1; j++) {
+                    let k = number - i - j;
+                    if (isPrime(i) && isPrime(j) && isPrime(k)) {
+                        combinations.push(`${i} + ${j} + ${k}`);
+                    }
+                }
+            }
+            return combinations;
+        }
+
+        function calculateGoldbach() {
+            const number = parseInt(document.getElementById('number').value);
+            const conjectureType = document.getElementById('conjectureType').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (number < 2) {
+                resultDiv.innerHTML = "Por favor, ingrese un número mayor o igual a 2.";
+                return;
+            }
+
+            let combinations = [];
+            let message = "";
+
+            switch(conjectureType) {
+                case "1":
+                    combinations = findTwoPrimeSums(number);
+                    message = `Combinaciones de dos primos para ${number}:`;
+                    break;
+                case "2":
+                    if (number <= 2 || number % 2 !== 0) {
+                        resultDiv.innerHTML = "Para esta parte de la conjetura, ingrese un número par mayor que 2.";
+                        return;
+                    }
+                    combinations = findTwoPrimeSums(number);
+                    message = `Combinaciones de dos primos para el número par ${number}:`;
+                    break;
+                case "3":
+                    if (number <= 5 || number % 2 === 0) {
+                        resultDiv.innerHTML = "Para esta parte de la conjetura, ingrese un número impar mayor que 5.";
+                        return;
+                    }
+                    combinations = findThreePrimeSums(number);
+                    message = `Combinaciones de tres primos para el número impar ${number}:`;
+                    break;
+            }
+
+            if (combinations.length > 0) {
+                resultDiv.innerHTML = `${message}<br>${combinations.join('<br>')}`;
+            } else {
+                resultDiv.innerHTML = `No se encontraron combinaciones para ${number}.`;
+            }
+        }
+    </script>
+</body>
+</html>
